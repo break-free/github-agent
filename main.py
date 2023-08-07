@@ -3,8 +3,10 @@ from langchain.agents import AgentType
 from langchain.agents import initialize_agent
 from langchain.agents.agent_toolkits.github.toolkit import GitHubToolkit
 from langchain.llms import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.utilities.github import GitHubAPIWrapper
 import json
+import custom_tools
 
 # List of required environment variables:
 env_vars = [
@@ -27,22 +29,26 @@ for var in env_vars:
     else: # Complaint line
         raise Exception(f"The environment variable {var} was not set. You must set this value to continue.")
     
-llm = OpenAI(temperature=0)
+gh_base_branch = os.environ["GITHUB_BASE_BRANCH"]
+    
+llm = ChatOpenAI(model="gpt-4")
+# llm = OpenAI(temperature=0,model="gpt-4")
 github = GitHubAPIWrapper()
 toolkit = GitHubToolkit.from_github_api_wrapper(github)
 
 tools = []
-unwanted_tools = ['Get Issue','Delete File', 'Create File']
 
+unwanted_tools = ['Get Issue','Delete File']
 for tool in toolkit.get_tools():
     if tool.name not in unwanted_tools:
         tools.append(tool)
+
+tools.append(custom_tools.search_online)
 
 agent = initialize_agent(
     tools=tools, llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
 )
 
-# request = "You have the software engineering capabilities of a Google Principle engineer. You are tasked with completing issues on a github repository. Please look at the existing issues and complete them."
-request = "Find relevant Github Application Documentation and place their documentation in the 'References' section of the root README.md file. Open a pull request into main for any changes."
+request = f"Search online for documentation about Github Applications and place their links in the 'References' section of the root README.md file. Open a pull request into {gh_base_branch} for any changes."
 
 agent.run(request)
