@@ -15,7 +15,8 @@ env_vars = [
     "GITHUB_REPOSITORY",
     "GITHUB_BRANCH",
     "GITHUB_BASE_BRANCH",
-    "OPENAI_API_KEY"
+    "OPENAI_API_KEY",
+    "GH_AUTH_TOKEN"
 ]
 
 # Check your json file for key values
@@ -44,14 +45,12 @@ for tool in toolkit.get_tools():
     if tool.name not in unwanted_tools:
         tools.append(tool)
 
-# tools.append(custom_tools.search_online)
+tools.append(custom_tools.create_branch)
 
 agent = initialize_agent(
     tools=tools, llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
 )
 
-# request = f"Search online for documentation about Github Applications and place their links in the 'References' section of the root README.md file. Open a pull request into {gh_base_branch} for any changes."
-request = f"Search online for documentation about Artificial Intelligence and place their links in the 'References' section of the root README.md file. Open a pull request into {gh_base_branch} for any changes."
-# request = f"Start a new git branch from {bot_branch}. Then, search online for documentation about macaroni & cheese and place their links in the 'Culinary' section of the root README.md file. Open a pull request from your new feature branch into {gh_base_branch} for any changes."
+request = f"Starting from {bot_branch}, start a new git branch called 'test'. Then search for recipes for macaroni & cheese and add it to the 'Culinary' section of the README.md file. Make a pull request back to {bot_branch} with any changes."
 
 agent.run(request)
