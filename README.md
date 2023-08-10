@@ -2,8 +2,12 @@
 Start on Github AI Tool
 
 ## Overview
+This agent is intended to create pull requests and/or manage github repositories as part of chains.
 
 ### Setup
+> [!WARNING]  
+> Be sure to explicitly name your environment json file as `envvars.json` to avoid publishing API keys and other sensitive secrets to github
+
 Start with a ./envvars.json like this (fill out actual values):
 ```
 {
@@ -16,3 +20,12 @@ Start with a ./envvars.json like this (fill out actual values):
     "OPENAI_API_KEY": "The API Key used for communicating with OpenAI."
 }
 ```
+
+### Simple Usage
+With current setup you can just call the main.py script:
+
+```py main.py```
+
+or, depending on your operating system:
+
+```python3 main.py```
