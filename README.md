@@ -1,4 +1,4 @@
-# github-tool
+# github-agent
 Start on Github AI Tool
 
 ## Overview
