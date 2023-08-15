@@ -51,6 +51,8 @@ for request in requests:
     agent.run(request)
 ```
 
+Then run `main.py` and watch the sparks fly
+
 # Tips & Tricks
 * When requesting edits be made to a file, be sure to include "once" in the prompt, else it may make several duplicate edits. Sometimes thousands. Yes you read that correctly -- thousands.
 * If you request the agent to create a pull request on your behalf, you'll very likely need to manually merge and/or close the pull request before proceeding to any future changes. [See Current Known Limitations](#current-known-limitations)
