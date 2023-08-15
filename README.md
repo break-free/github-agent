@@ -42,6 +42,7 @@ for request in requests:
 
 ### Tips & Tricks
 * When requesting edits be made to a file, be sure to include "once" in the prompt, else it may make several duplicate edits. Sometimes thousands.
+* If you request the agent to create a pull request on your behalf, you'll very likely need to manually merge and/or close the pull request before proceeding to any future changes. [See Current Known Limitations](#current-known-limitations)
 * If, for whatever reason, there is a change in a pull request you DON'T want to be included from `GITHUB_BRANCH` to the `GITHUB_BASE_BRANCH`, you will likely need to manually intervene & revert the change on `GITHUB_BRANCH` before continuing. Occasionally deleting a pull request is enough, but usually not because each subsequent edit starts from `GITHUB_BASE_BRANCH`.
 
 ### Current Known Limitations
@@ -51,8 +52,10 @@ for request in requests:
   
   This can setup some odd problems, especially if a change is made in the `GITHUB_BRANCH` that doesn't get accepted into the `GITHUB_BASE_BRANCH` because the agent doesn't REALLY have any knowledge of the commit history within its `GITHUB_BRANCH` and will get version conflict errors
 
-*-* The Langchain Github agent is really only configured to communicate over two branches out-of-box and requires additional configuration/tooling to be able to communicate with different branches
+* The Langchain Github agent is really only configured to communicate over two branches out-of-box and requires additional configuration/tooling to be able to communicate with different branches
+
+* The Langchain Github agent seems to really only work with a user's repo and not necessarily an organization's. 
 
 ### Future Work
-Custom tools:
 * Allow multiple commits before requiring a pull request from `GITHUB_BRANCH` to `GITHUB_BASE_BRANCH`
+* Allow work on an organization's repository
