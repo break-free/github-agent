@@ -5,21 +5,33 @@ from github import Github
 from github import Auth
 import json
 
-# @tool
-# def search_online(input:str):
-#     """
-#     Search online for and return the very first link found from an input term or phrase.
-#     """
-    
-#     # Just a limitation of the package used; if you don't use a list it'll provide a generator class instead of a string:
-#     result = list(search(term=input, num_results=1))
-        
-#     return result[0]
-
 @tool
 def create_branch(new_branch:str):
     """
     Create a new git branch from the provided repository
+    """
+
+    auth = Auth.Token(os.environ["GH_AUTH_TOKEN"])
+    
+    g = Github(auth=auth)
+
+    repo = os.environ["GITHUB_REPOSITORY"]
+    current_branch = os.environ["GITHUB_BRANCH"] # Make sure we're always pulling from the bot's branch
+    
+    repository = g.get_repo(full_name_or_id=repo)
+    branch = repository.get_branch(current_branch)
+    head = branch.commit
+
+    # print(f"Repo:{repository.name}\n\nBranch:{branch.name}\n\nHead Commit sha:{head.sha}")
+
+    repository.create_git_ref(ref=f"refs/heads/{new_branch}", sha=head.sha)
+
+    return f"New branch: {new_branch}"
+
+@tool
+def get_latest_commit(branch:str):
+    """
+    Get the latest commit sha
     """
 
     auth = Auth.Token(os.environ["GH_AUTH_TOKEN"])
@@ -33,11 +45,7 @@ def create_branch(new_branch:str):
     branch = repository.get_branch(current_branch)
     head = branch.commit
 
-    # print(f"Repo:{repository.name}\n\nBranch:{branch.name}\n\nHead Commit sha:{head.sha}")
-
-    # repository.create_git_ref(ref=f"refs/head/{new_branch}", sha=head.sha)
-    repository.create_git_ref(ref=f"refs/heads/{new_branch}", sha=head.sha)
-    # repository.merge(base=)
+    return head
     
 # # List of required environment variables:
 # env_vars = [

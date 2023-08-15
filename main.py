@@ -7,6 +7,8 @@ from langchain.chat_models import ChatOpenAI
 from langchain.utilities.github import GitHubAPIWrapper
 import json
 import custom_tools
+import string
+import random
 
 # List of required environment variables:
 env_vars = [
@@ -39,18 +41,24 @@ toolkit = GitHubToolkit.from_github_api_wrapper(github)
 
 tools = []
 
-# unwanted_tools = ['Get Issue','Delete File']
 unwanted_tools = []
 for tool in toolkit.get_tools():
     if tool.name not in unwanted_tools:
         tools.append(tool)
 
 tools.append(custom_tools.create_branch)
+tools.append(custom_tools.get_latest_commit)
 
 agent = initialize_agent(
     tools=tools, llm=llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True
 )
 
-request = f"Starting from {bot_branch}, start a new git branch called 'test'. Then search for recipes for macaroni & cheese and add it to the 'Culinary' section of the README.md file. Make a pull request back to {bot_branch} with any changes."
+requests = [
+    f"Add a single movie quote to the 'Movie Quotes' section in the README.md. Place a new line between any existing movie quotes and your new one. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
+    ,f"Make a new feature branch called '{''.join(random.choices(string.ascii_letters, k=5))}'" # Make a random 5-letter feature branch
+    f"Give me the latest commit from  the 'main' branch"
+    ]
 
-agent.run(request)
+for request in requests:
+    print(f"Running against the request:\n\n{request}\n")
+    agent.run(request)
