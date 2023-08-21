@@ -54,9 +54,10 @@ agent = initialize_agent(
 )
 
 requests = [
-    f"Add a single movie quote to the 'Movie Quotes' section in the README.md. Place a new line between any existing movie quotes and your new one. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
-    ,f"Make a new feature branch called '{''.join(random.choices(string.ascii_letters, k=5))}'" # Make a random 5-letter feature branch
-    f"Give me the latest commit from  the 'main' branch"
+    f"Make a new feature branch called '{''.join(random.choices(string.ascii_letters, k=5))}'" # Make a random 5-letter feature branch
+    ,f"Use an available tool to describe the color yellow"
+    # f"Add a single movie quote to the 'Movie Quotes' section in the README.md. Place a new line between any existing movie quotes and your new one. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
+    # f"Give me the latest commit from  the 'main' branch"
     ]
 
 for request in requests:
