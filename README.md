@@ -7,12 +7,15 @@ The agent is configured against two branches, the `GITHUB_BASE_BRANCH` (default 
 > [!WARNING]  
 > Be sure to use a json file as your environment file to avoid publishing API keys and other sensitive secrets to github. The `.gitignore` in this repo ignores `*.json` from being accidentally committed.
 
-First, you will need to setup a Github Application. At a high level:
-* [Register the application](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app)
+> [!NOTE]
+> BreakFree already has an application called installed on this github repository. If you would like to continue using it, reach out to Zak Alford since he owns it. Otherwise, continue below:
 
+First, you will need to setup a Github Application. At a high level:
 * Create an application. You can either write your own (see [here](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps)) or you can follow a [quickstart tutorial](https://docs.github.com/en/apps/creating-github-apps/writing-code-for-a-github-app/quickstart). 
-> [!NOTE]  
+> [!IMPORTANT]  
 > The functionality/code of the application likely will not actually be consumed by the agent, but you need to create an application for the agent to consume
+
+* [Register the application](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app)
 
 * [Install the application for your repository that you want the agent to manage](https://docs.github.com/en/apps/using-github-apps/installing-your-own-github-app)
 
@@ -24,7 +27,7 @@ First, you will need to setup a Github Application. At a high level:
     "GITHUB_REPOSITORY": "The name of the Github repository you want your bot to act upon. Must follow the format {username}/{repo-name}. Make sure the app has been added to this repository first!",
     "GITHUB_BRANCH": "The branch where the bot will make its commits. Defaults to 'master.'",
     "GITHUB_BASE_BRANCH": "The base branch of your repo, usually either 'main' or 'master.' This is where pull requests will base from. Must match the repository's Default Branch. This value defaults to 'master.'"
-    "GH_AUTH_TOKEN": "User Credentials to allow more nuanced GH commands. Unsure if it's really necessary yet."
+    "GH_AUTH_TOKEN": "User Credentials to allow more nuanced GH commands. Unsure if it's really necessary yet, but is currently being used for actions not available out-of-box like creating a new git branch."
     "OPENAI_API_KEY": "The API Key used for communicating with OpenAI."
 }
 ```
@@ -55,21 +58,26 @@ Then run `main.py` and watch the sparks fly
 
 # Tips & Tricks
 * When requesting edits be made to a file, be sure to include "once" in the prompt, else it may make several duplicate edits. Sometimes thousands. Yes you read that correctly -- thousands.
+
 * If you request the agent to create a pull request on your behalf, you'll very likely need to manually merge and/or close the pull request before proceeding to any future changes. [See Current Known Limitations](#current-known-limitations)
+
 * If, for whatever reason, there is a change in a pull request you DON'T want to be included from `GITHUB_BRANCH` to the `GITHUB_BASE_BRANCH`, you will likely need to manually intervene & revert the change on `GITHUB_BRANCH` before continuing. Occasionally deleting a pull request is enough, but usually not because each subsequent edit starts from `GITHUB_BASE_BRANCH`.
 
 # Current Known Limitations
 * The general workflow for any changes the agent attempts seems to be 
-  - Read a file's contents based on the current state of the `GITHUB_BASE_BRANCH`, which ultimately serves as the merge destination. THIS DOES NOT USE COMMIT HASHES, TRULY JUST A READ FROM THE BASE FILE (a la `curl` or `wget`)
-  - Commit any changes to the `GITHUB_BRANCH` based on its original findings of the value of the file(s) from `GITHUB_BASE_BRANCH`
+  1. Read a file's contents based on the current state of the `GITHUB_BASE_BRANCH`, which ultimately serves as the merge destination. THIS DOES NOT USE COMMIT HASHES, TRULY JUST A READ FROM THE BASE FILE (a la `curl` or `wget`)
+  2. Commit any changes to the `GITHUB_BRANCH` based on its original findings of the value of the file(s) from `GITHUB_BASE_BRANCH`
   
-  This can setup some odd problems, especially if a change is made in the `GITHUB_BRANCH` that doesn't get accepted into the `GITHUB_BASE_BRANCH` because the agent doesn't REALLY have any knowledge of the commit history within its `GITHUB_BRANCH` and will get version conflict errors
+        This can setup some odd problems, especially if a change is made in the `GITHUB_BRANCH` that doesn't get accepted into the `GITHUB_BASE_BRANCH` because the agent doesn't REALLY have any knowledge of the commit history within its `GITHUB_BRANCH` and will get version conflict errors
 
 * The Langchain Github agent is really only configured to communicate over two branches out-of-box and requires additional configuration/tooling to be able to communicate with different branches
 
-* The Langchain Github agent seems to really only work with a user's repo and not necessarily an organization's. 
+# TODO as part of BAM-594
+These are simply the tasks / direction Zak was headed when he last worked on this project. Feel free to adjust direction, steps, methods, or any other decisions as you see fit. It doesn't even need to be in this project if it feels like an easier approach could be taken.
+
+* Create a for loop that detects all tools within the `main.py`` so that we can append them to being available to the agent
+* Have a `new_tool.py` 'module' available to the agent that writes a new function back to the `custom_tools.py`
 
 # Future Work
 * Allow multiple commits before requiring a pull request from `GITHUB_BRANCH` to `GITHUB_BASE_BRANCH`
-* Allow work on an organization's repository
 * Experiment with different types of agents to allow multi-parameter custom tools
