@@ -75,7 +75,7 @@ Then run `main.py` and watch the sparks fly
 # TODO as part of BAM-594
 These are simply the tasks / direction Zak was headed when he last worked on this project. Feel free to adjust direction, steps, methods, or any other decisions as you see fit. It doesn't even need to be in this project if it feels like an easier approach could be taken.
 
-* Create a for loop that detects all tools within the `main.py`` so that we can append them to being available to the agent
+* Create a for loop in `main.py` that detects all tools within the `custom_tools.py` so that we can append them to being available to the agent
 * Have a `new_tool.py` 'module' available to the agent that writes a new function back to the `custom_tools.py`
 
 # Future Work
