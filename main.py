@@ -2,14 +2,12 @@ import os
 from langchain.agents import AgentType
 from langchain.agents import initialize_agent
 from langchain.agents.agent_toolkits.github.toolkit import GitHubToolkit
-from langchain.llms import OpenAI
 from langchain.chat_models import ChatOpenAI
 from langchain.utilities.github import GitHubAPIWrapper
 import json
 import custom_tools
 import string
 import random
-import inspect
 
 # List of required environment variables:
 env_vars = [
@@ -27,12 +25,14 @@ with open("envvars.json", "r") as f:
     env_var_values = json.load(f)
 
 for var in env_vars:
-    # Check that each key exists. If it doesn't, set it to be "" and then complain later
+    # Check that each key exists. If it doesn't, set it to be "" and then
+    # complain later
     if env_var_values.get(var, "") != "":
         os.environ[var] = env_var_values[var]
     else:  # Complaint line
         raise Exception(
-            f"The environment variable {var} was not set. You must set this value to continue."
+            f"""The environment variable {var} was not set. You must set """
+            f"""this value to continue."""
         )
 
 bot_branch = os.environ["GITHUB_BRANCH"]
@@ -59,35 +59,29 @@ agent = initialize_agent(
     verbose=True,
 )
 
-"""
-Attempt to loop through the objects available within a module to find functions that are appended w/ 
-the Langchain '@Tool'. Feel free to trash if there are better approaches -- there very likely are.
-"""
-# Iterate over the names and check if each is a function
-# for tool in dir(custom_tools):
-# Get the objects from the module
-# obj = getattr(custom_tools, tool)
-
-# Check if the object is a function (which will happen to be a tool)
-# if inspect.isfunction(obj):
-#     print(tool)
-
+# Make a random 5-letter feature branch
+random_branch_name = 'br_' + ''.join(random.choices(string.ascii_letters, k=5))
 requests = [
-    f"Make a new feature branch called '{''.join(random.choices(string.ascii_letters, k=5))}'"  # Make a random 5-letter feature branch
-    ,f"Give me the latest commit from  the 'main' branch",
+    f"Make a new feature branch called '{random_branch_name}'",
+    f"Give me the latest commit from  the '{gh_base_branch}' branch",
     f"Add one movie quote to a new 'Movie Quote' section in the README.md. Place a new line between the section title and the movie quote. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
 ]
 
-"""
-Feel free to tweak the below requests and include them 
-in the above list -- I just didn't want to leave a broken state where
-there was a commit created by the agent hanging in the bot branch that didn't make it back to dev.
-See the README.md to understand why.
-"""
-# f"Add a single movie quote to the 'Movie Quotes' section in the README.md. Place a new line between any existing movie quotes and your new one. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
-#
-# ,f"Use an available tool to describe the color yellow"
-
+# Run the agent with the requests
 for request in requests:
     print(f"Running against the request:\n\n{request}\n")
     agent.run(request)
+
+"""
+Feel free to tweak the below requests and include them
+in the above list -- I just didn't want to leave a broken state where
+there was a commit created by the agent hanging in the bot branch that didn't
+make it back to dev. See the README.md to understand why.
+"""
+
+"""
+Some example prompts:
+
+# f"Add a single movie quote to the 'Movie Quotes' section in the README.md. Place a new line between any existing movie quotes and your new one. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
+# ,f"Use an available tool to describe the color yellow"
+"""

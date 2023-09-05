@@ -1,14 +1,21 @@
-# Overview
+# `github-agent` Demonstration
 
 This github agent is intended to create pull requests and/or manage github
 repositories as part of chains.
+
+
+# Setup
+
+
+## Environment
+
+
+## Application
 
 The agent is configured against two branches, the `GITHUB_BASE_BRANCH` (default
 branch) and a separate `GITHUB_BRANCH` that should be considered "dedicated" for
 the agent to make commits.
 
-
-# Setup
 
 > [!WARNING]
 > Be sure to use a `*.json` file as your environment file to avoid publishing
@@ -41,23 +48,89 @@ download a new `*.pem` key file for use. Save this local to this code base
 1. Create a new or use an existing OpenAI key using [this guide](https://breakfree.atlassian.net/wiki/spaces/BFAIML/pages/2289369089/Using+the+BreakFree+OpenAI+Account).
 
 1. Create a `envvars.json` like the below. Values for `GITHUB_APP_PRIVATE_KEY`,
-`GH_AUTH_TOKEN`, and `OPENAI_API_KEY` (as created/used above) are required to
-use the default BreakFree GitHub app.
+`GH_AUTH_TOKEN`, and `OPENAI_API_KEY` (as created/used above) are required. All
+other values are provided when using the default BreakFree GitHub app.
 
-```[json]
+```json
 {
     "GITHUB_APP_ID": "383948",
     "GITHUB_APP_PRIVATE_KEY": "Your app's private key .pem file location; if the location is the local directory just add `<filename>.pem`",
     "GITHUB_REPOSITORY": "break-free/github-agent-demo",
     "GITHUB_BRANCH": "bot-branch",
-    "GITHUB_BASE_BRANCH": "main"
-    "GH_AUTH_TOKEN": "User Credentials to allow more nuanced GH commands. Unsure if it's really necessary yet, but is currently being used for actions not available out-of-box like creating a new git branch."
+    "GITHUB_BASE_BRANCH": "main",
+    "GH_AUTH_TOKEN": "User Credentials to allow more nuanced GH commands. Unsure if it's really necessary yet, but is currently being used for actions not available out-of-box like creating a new git branch.",
     "OPENAI_API_KEY": "The API Key used for communicating with OpenAI."
 }
 ```
 
+> [!NOTE]
+> If you wish to set up your own GitHub app, then you can either write your own
+> (see [here](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps))
+> or you can follow a [quickstart tutorial](https://docs.github.com/en/apps/creating-github-apps/writing-code-for-a-github-app/quickstart). Then you must
+> [register the application](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app) and then
+> [install the application for your repository that you want the agent to manage](https://docs.github.com/en/apps/using-github-apps/installing-your-own-github-app).
 
-# Simple Usage
+
+# Demonstration
+
+Executing the following command runs the demonstration:
+
+```bash
+python3 main.py
+```
+
+This will:
+
+- Create a new branch.
+- Load the `README.md` of the `github-agent-demo` repository.
+- Re-write the `README.md`.
+- Commit to the `bot-branch` and create a pull request to `main`.
+
+
+## Cleaning up between demonstrations
+
+
+### Option 1
+
+To clean up between demonstrations:
+
+- From GitHub, delete the new branch; it will have a randomized five-letter
+name. Also, close the created pull request from `bot-branch` to `main` and do
+not delete the branch.
+- From the console/command line, reset the head of the `bot-branch`:
+
+```bash
+git fetch
+git checkout -b <GITHUB_BRANCH>
+git pull
+git log  # Optional
+git reset --hard HEAD~1
+git push --force --set-upstream origin <GITHUB_BRANCH>
+```
+
+Note that for successive resets only the last three commands are required and
+change to:
+
+```bash
+git pull
+git log  # Optional
+git reset --hard HEAD~1
+git push --force
+```
+
+> [!WARNING]
+> Using git reset is a dangerous maneuver and should never be attempted on
+> `main`, hence the use of `bot-branch`. If it gets out of control, then you
+> can delete and re-create the `bot-branch` (and any other branches). This
+> resets the branch and the demonstration.
+
+
+### Option 2
+
+- If you request the agent to create a pull request on your behalf, you'll very
+likely need to manually merge and/or close the pull request before proceeding to
+any future changes. [See Current Known Limitations](#current-known-limitations)
+
 
 The `main.py` script installs any custom tools configured in the
 `custom_tools.py`.
@@ -71,7 +144,7 @@ For example, to make 3 individual requests to the LLM to:
 
 You could use the below:
 
-```[python]
+```python
 requests = [
     f"Add a single movie quote to the 'Movie Quotes' section in the README.md. Place a new line between any existing movie quotes and your new one. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
     ,f"Make a new feature branch called '{''.join(random.choices(string.ascii_letters, k=5))}'" # Make a random 5-letter feature branch
@@ -92,40 +165,33 @@ Then run `main.py` and watch the sparks fly
 prompt, else it may make several duplicate edits. Sometimes thousands. Yes you
 read that correctly -- **thousands**.
 
-- If you request the agent to create a pull request on your behalf, you'll very
-likely need to manually merge and/or close the pull request before proceeding to
-any future changes. [See Current Known Limitations](#current-known-limitations)
-
 - If, for whatever reason, there is a change in a pull request you DON'T want to
 be included from `GITHUB_BRANCH` to the `GITHUB_BASE_BRANCH`, you will likely
 need to manually intervene & revert the change on `GITHUB_BRANCH` before
 continuing. Occasionally deleting a pull request is enough, but usually not
-because each subsequent edit starts from `GITHUB_BASE_BRANCH`.
-
-> [!WARNING]
-> If you wish to set up your own GitHub app, then you can either write your own
-> (see [here](https://docs.github.com/en/apps/creating-github-apps/about-creating-github-apps/about-creating-github-apps))
-> or you can follow a [quickstart tutorial](https://docs.github.com/en/apps/creating-github-apps/writing-code-for-a-github-app/quickstart). Then you must
-> [register the application](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app) and then
-> [install the application for your repository that you want the agent to manage](https://docs.github.com/en/apps/using-github-apps/installing-your-own-github-app)
+because each subsequent edit starts from `GITHUB_BASE_BRANCH`. For example to
+reset `GITHUB_BRANCH` that has only **one** change:
 
 
 # Current Known Limitations
 
-* The general workflow for any changes the agent attempts seems to be 
-  1. Read a file's contents based on the current state of the
-  `GITHUB_BASE_BRANCH`, which ultimately serves as the merge destination. THIS
-  DOES NOT USE COMMIT HASHES, TRULY JUST A READ FROM THE BASE FILE (a la `curl`
-  or `wget`)
-  2. Commit any changes to the `GITHUB_BRANCH` based on its original findings of
-  the value of the file(s) from `GITHUB_BASE_BRANCH`
-  
-        This can setup some odd problems, especially if a change is made in the
-        `GITHUB_BRANCH` that doesn't get accepted into the `GITHUB_BASE_BRANCH`
-        because the agent doesn't REALLY have any knowledge of the commit
-        history within its `GITHUB_BRANCH` and will get version conflict errors
+- The general workflow for any changes the agent attempts seems to be
 
-* The Langchain Github agent is really only configured to communicate over two
+    1. Read a file's contents based on the current state of the
+    `GITHUB_BASE_BRANCH`, which ultimately serves as the merge destination. THIS
+    DOES NOT USE COMMIT HASHES, TRULY JUST A READ FROM THE BASE FILE (a la
+    `curl` or `wget`)
+
+    1. Commit any changes to the `GITHUB_BRANCH` based on its original findings
+    of the value of the file(s) from `GITHUB_BASE_BRANCH`
+  
+        - This can setup some odd problems, especially if a change is made in
+        the `GITHUB_BRANCH` that doesn't get accepted into the
+        `GITHUB_BASE_BRANCH` because the agent doesn't REALLY have any knowledge
+        of the commit history within its `GITHUB_BRANCH` and will get version
+        conflict errors
+
+- The Langchain Github agent is really only configured to communicate over two
 branches out-of-box and requires additional configuration/tooling to be able to
 communicate with different branches
 
@@ -137,15 +203,15 @@ this project. Feel free to adjust direction, steps, methods, or any other
 decisions as you see fit. It doesn't even need to be in this project if it feels
 like an easier approach could be taken.
 
-* Create a for loop in `main.py` that detects all tools within the
+- [ ] Create a for loop in `main.py` that detects all tools within the
 `custom_tools.py` so that we can append them to being available to the agent
-* Have a `new_tool.py` 'module' available to the agent that writes a new
+- [ ] Have a `new_tool.py` 'module' available to the agent that writes a new
 function back to the `custom_tools.py`
 
 
 # Future Work
 
-* Allow multiple commits before requiring a pull request from `GITHUB_BRANCH` to
+- Allow multiple commits before requiring a pull request from `GITHUB_BRANCH` to
 `GITHUB_BASE_BRANCH`
-* Experiment with different types of agents to allow multi-parameter custom
+- Experiment with different types of agents to allow multi-parameter custom
 tools

@@ -5,3 +5,4 @@ __pycache__/
 # Repo/App-specific stuff:
 *.json
 *.pem
+errors_thrown.txt
