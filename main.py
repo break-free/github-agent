@@ -74,7 +74,8 @@ the Langchain '@Tool'. Feel free to trash if there are better approaches -- ther
 
 requests = [
     f"Make a new feature branch called '{''.join(random.choices(string.ascii_letters, k=5))}'"  # Make a random 5-letter feature branch
-    ,f"Give me the latest commit from  the 'main' branch"
+    ,f"Give me the latest commit from  the 'main' branch",
+    f"Add one movie quote to a new 'Movie Quote' section in the README.md. Place a new line between the section title and the movie quote. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
 ]
 
 """
@@ -84,6 +85,7 @@ there was a commit created by the agent hanging in the bot branch that didn't ma
 See the README.md to understand why.
 """
 # f"Add a single movie quote to the 'Movie Quotes' section in the README.md. Place a new line between any existing movie quotes and your new one. Then create a pull request to {gh_base_branch} with any changes. Do not create a new branch if the pull request fails."
+#
 # ,f"Use an available tool to describe the color yellow"
 
 for request in requests:
