@@ -85,8 +85,9 @@ Note that the `main` branch is read-only, and pull requests will not succeed.
 
 ## Cleaning up between demonstrations
 
-To clean up between demonstrations, from GitHub delete the new branch; it will
-have a randomized five-letter name. You will need to confirm the deletion.
+To clean up between demonstrations, [from GitHub delete the new branch](https://github.com/break-free/github-agent-demo/branches);
+it will have a randomized five-letter name. You will need to confirm the
+deletion.
 
 # Tips & Tricks
 
