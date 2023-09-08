@@ -19,8 +19,8 @@ for key, value in env_vars.items():
         os.environ[key] = value
     else:
         raise Exception(
-            f"""The environment variable '{key}' was not set. You must """
-            f"""set this value to continue."""
+            f"""The environment variable '{key}' was not set. You must set """
+            f"""this value to continue."""
         )
 
 main_branch = os.environ["GITHUB_BASE_BRANCH"]
@@ -41,5 +41,7 @@ agent = initialize_agent(
 )
 
 agent.run(
-    f"""In a new branch '{new_branch}' from '{main_branch}', edit the 'README.md' to add a new 'Movie Quote' section with one movie quote at the end of the file, then create a pull request to merge."""
+    f"""In a new branch '{new_branch}' from '{main_branch}', edit the """
+    f""""'README.md' to add one new 'Movie Quote' section that includes one """
+    f"""movie quote only, and then create a pull request to merge."""
 )
