@@ -5,7 +5,25 @@ repositories as part of chains.
 
 # Setup
 
+Note these installation instructions assume you are running a Fedora Linux
+instance with `toolbox` installed. For installation on other operating systems,
+follow the steps as executed in the build script.
+
 ## Environment
+
+To install and run the `main.py` script first download the repository.
+
+    git clone https://github.com/break-free/github-agent.git
+
+Once downloaded enter the directory and run the build script. Note you need an
+OpenAI API key to run the build script; it will not run without one.
+
+    cd github-agent
+    ./setup/build_github-agent.sh $OPENAI_API_KEY
+
+Once completed, enter the toolbox.
+
+    toolbox enter unit-test-agent
 
 ## Application
 
@@ -94,35 +112,3 @@ deletion.
 - When requesting edits be made to a file, be sure to include "once" in the
 prompt, else it may make several duplicate edits. Sometimes thousands. Yes you
 read that correctly -- **thousands**.
-
-# Current Known Limitations
-
-- The general workflow for any changes the agent attempts seems to be
-
-    1. Read a file's contents based on the current state of the
-    `GITHUB_BASE_BRANCH`, which ultimately serves as the merge destination. THIS
-    DOES NOT USE COMMIT HASHES, TRULY JUST A READ FROM THE BASE FILE (a la
-    `curl` or `wget`)
-
-- The Langchain Github agent is really only configured to communicate over two
-branches out-of-box and requires additional configuration/tooling to be able to
-communicate with different branches
-
-# TODO as part of BAM-594
-
-These are simply the tasks / direction Zak was headed when he last worked on
-this project. Feel free to adjust direction, steps, methods, or any other
-decisions as you see fit. It doesn't even need to be in this project if it feels
-like an easier approach could be taken.
-
-- [ ] Create a for loop in `main.py` that detects all tools within the
-`custom_tools.py` so that we can append them to being available to the agent
-- [ ] Have a `new_tool.py` 'module' available to the agent that writes a new
-function back to the `custom_tools.py`
-
-# Future Work
-
-- Allow multiple commits before requiring a pull request from `GITHUB_BRANCH` to
-`GITHUB_BASE_BRANCH`
-- Experiment with different types of agents to allow multi-parameter custom
-tools
