@@ -14,17 +14,17 @@ follow the steps as executed in the build script.
 To install and run the `main.py` script first download the repository.
 
     git clone https://github.com/break-free/github-agent.git
+    cd github-agent
     git checkout main
 
 Once downloaded enter the directory and run the build script. Note you need an
 OpenAI API key to run the build script; it will not run without one.
 
-    cd github-agent
     ./setup/build_github-agent.sh $OPENAI_API_KEY
 
 Once completed, enter the toolbox.
 
-    toolbox enter unit-test-agent
+    toolbox enter github-agent
 
 ## Application
 

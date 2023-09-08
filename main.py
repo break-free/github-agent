@@ -27,7 +27,8 @@ main_branch = os.environ["GITHUB_BASE_BRANCH"]
 new_branch = 'fix_' + ''.join(random.choices(string.ascii_letters, k=5))
 os.environ["GITHUB_BRANCH"] = new_branch
 
-toolkit = GitHubToolkit.from_github_api_wrapper(GitHubAPIWrapper())
+github = GitHubAPIWrapper()
+toolkit = GitHubToolkit.from_github_api_wrapper(github)
 tools = [] + toolkit.get_tools()
 tools.append(custom_tools.CreateBranch())
 
