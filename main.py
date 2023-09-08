@@ -42,6 +42,6 @@ agent = initialize_agent(
 
 agent.run(
     f"""In a new branch '{new_branch}' from '{main_branch}', edit the """
-    f""""'README.md' to add one new 'Movie Quote' section that includes one """
+    f"""'README.md' to add one new 'Movie Quote' section that includes one """
     f"""movie quote only, and then create a pull request to merge."""
 )
